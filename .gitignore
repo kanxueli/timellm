@@ -1,0 +1,11 @@
+/dataset/electricity
+/dataset/ETT-small
+/dataset/exchange_rate
+/dataset/illness
+/dataset/m4
+/dataset/PEMS
+/dataset/traffic
+/dataset/weather
+
+
+/layers/__pycache__/*.pyc

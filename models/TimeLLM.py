@@ -42,14 +42,15 @@ class Model(nn.Module):
 
         if configs.llm_model == 'LLAMA':
             # self.llama_config = LlamaConfig.from_pretrained('/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/')
-            self.llama_config = LlamaConfig.from_pretrained('huggyllama/llama-7b')
+            self.llama_config = LlamaConfig.from_pretrained('/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/LLaMA-7B')
             self.llama_config.num_hidden_layers = configs.llm_layers
             self.llama_config.output_attentions = True
             self.llama_config.output_hidden_states = True
             try:
                 self.llm_model = LlamaModel.from_pretrained(
                     # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/",
-                    'huggyllama/llama-7b',
+                    # 'huggyllama/llama-7b',
+                    '/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/LLaMA-7B',
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.llama_config,
@@ -68,7 +69,7 @@ class Model(nn.Module):
             try:
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     # "/mnt/alps/modelhub/pretrained_model/LLaMA/7B_hf/tokenizer.model",
-                    'huggyllama/llama-7b',
+                    '/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/LLaMA-7B',
                     trust_remote_code=True,
                     local_files_only=True
                 )
@@ -81,14 +82,15 @@ class Model(nn.Module):
                     local_files_only=False
                 )
         elif configs.llm_model == 'GPT2':
-            self.gpt2_config = GPT2Config.from_pretrained('openai-community/gpt2')
+            self.gpt2_config = GPT2Config.from_pretrained('/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/gpt2')
+            # self.gpt2_config = GPT2Config.from_pretrained('openai-community/gpt2')
 
             self.gpt2_config.num_hidden_layers = configs.llm_layers
             self.gpt2_config.output_attentions = True
             self.gpt2_config.output_hidden_states = True
             try:
                 self.llm_model = GPT2Model.from_pretrained(
-                    'openai-community/gpt2',
+                    '/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/gpt2',
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.gpt2_config,
@@ -104,7 +106,7 @@ class Model(nn.Module):
 
             try:
                 self.tokenizer = GPT2Tokenizer.from_pretrained(
-                    'openai-community/gpt2',
+                    '/home/likx/time_series_forecasting/datasets_and_checkpoints/checkpoints/gpt2',
                     trust_remote_code=True,
                     local_files_only=True
                 )

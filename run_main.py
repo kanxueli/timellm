@@ -96,7 +96,7 @@ parser.add_argument('--lradj', type=str, default='type1', help='adjust learning 
 parser.add_argument('--pct_start', type=float, default=0.2, help='pct_start')
 parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 parser.add_argument('--llm_layers', type=int, default=6)
-parser.add_argument('--percent', type=int, default=100)
+parser.add_argument('--percent', type=int, default=15)
 
 args = parser.parse_args()
 ddp_kwargs = DistributedDataParallelKwargs(find_unused_parameters=True)
@@ -126,6 +126,7 @@ for ii in range(args.itr):
     train_data, train_loader = data_provider(args, 'train')
     vali_data, vali_loader = data_provider(args, 'val')
     test_data, test_loader = data_provider(args, 'test')
+    print("############# Train DATA:{}, Valid DATA:{}, Test DATA: {}".format(len(train_data), len(vali_data), len(test_data)))
 
     if args.model == 'Autoformer':
         model = Autoformer.Model(args).float()
@@ -240,7 +241,7 @@ for ii in range(args.itr):
         accelerator.print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
         train_loss = np.average(train_loss)
         vali_loss, vali_mae_loss = vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric)
-        test_loss, test_mae_loss = vali(args, accelerator, model, test_data, test_loader, criterion, mae_metric)
+        test_loss, test_mae_loss = vali(args, accelerator, model, "TEST", test_loader, criterion, mae_metric)
         accelerator.print(
             "Epoch: {0} | Train Loss: {1:.7f} Vali Loss: {2:.7f} Test Loss: {3:.7f} MAE Loss: {4:.7f}".format(
                 epoch + 1, train_loss, vali_loss, test_loss, test_mae_loss))

@@ -2,8 +2,10 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import shutil
-
+from utils.metrics import metric
+from utils.ddp import get_world_size, is_main_process, gather_tensors_from_all_gpus
 from tqdm import tqdm
+import torch.distributed as dist
 
 plt.switch_backend('agg')
 
@@ -137,7 +139,10 @@ def del_files(dir_path):
 def vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric):
     total_loss = []
     total_mae_loss = []
+    preds = []
+    trues = []
     model.eval()
+    device_id = dist.get_rank() % torch.cuda.device_count()
     with torch.no_grad():
         for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in tqdm(enumerate(vali_loader)):
             batch_x = batch_x.float().to(accelerator.device)
@@ -171,6 +176,9 @@ def vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric
 
             pred = outputs.detach()
             true = batch_y.detach()
+            # print(np.array(outputs.detach().cpu().numpy()).shape, np.array(batch_y.detach().cpu().numpy()).shape)
+            preds.append(outputs.detach().cpu())
+            trues.append(batch_y.detach().cpu())
 
             loss = criterion(pred, true)
 
@@ -181,6 +189,16 @@ def vali(args, accelerator, model, vali_data, vali_loader, criterion, mae_metric
 
     total_loss = np.average(total_loss)
     total_mae_loss = np.average(total_mae_loss)
+    
+    # Classification Metrics
+    preds = gather_tensors_from_all_gpus(preds, device_id)
+    trues = gather_tensors_from_all_gpus(trues, device_id)
+    preds = np.array(preds)
+    trues = np.array(trues)
+    preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
+    trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
+    mae, mse, rmse, mape, mspe = metric(preds, trues, 1)
+    print('data_task_name {}: VitalDB mse:{}, mae:{}'.format('Test' if vali_data == 'TEST' else 'Non Test', mse, mae))
 
     model.train()
     return total_loss, total_mae_loss

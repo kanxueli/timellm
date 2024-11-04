@@ -1,0 +1,3 @@
+The dataset used in this study is the open database VitalDB, which is specialized for machine learning studies related to vital signs. The dataset was collected by Seoul National University.
+In surgeries under general anesthesia, hypotension (MAP below 65 mmHg) poses significant risks to patients, making accurate prediction critical. You will use the VitalDB dataset, focusing on the trend of mean arterial pressure (MAP) over the past 15 minutes, to predict MAP for the next 5 minutes. The goal is time series forecasting: based on the MAP sequence from the previous 15 minutes, predict the MAP sequence for the upcoming 5 minutes, paying particular attention to any predicted values below the threshold of 65 mmHg.
+The task is time series forecasting.
